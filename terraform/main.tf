@@ -56,5 +56,48 @@ resource "aws_dynamodb_table" "scheduler-db" {
   point_in_time_recovery {
     enabled = true
   }
+}
 
+resource "aws_iam_role" "lambda-iam" {
+  name = "lambda-iam"
+
+  assume_role_policy = jsonencode({
+    "Version" : "2012-10-17",
+    "Statement" : [
+      {
+        "Effect" : "Allow",
+        "Principal" : {
+          "Service" : "lambda.amazonaws.com"
+        },
+        "Action" : "sts:AssumeRole"
+      }
+    ]
+  })
+}
+
+data "aws_iam_policy" "required-policy" {
+  for_each    = toset(var.aws_lambda_iam_roles)
+  name        = each.value
+}
+
+resource "aws_iam_role_policy_attachment" "lambda-policy" {
+  for_each    = data.aws_iam_policy.required-policy
+
+  role        = aws_iam_role.lambda-iam.name
+  policy_arn  = each.value.arn
+}
+
+resource "aws_iam_role_policy" "dynamodb-lambda-policy" {
+  name = "dynamodb-lambda-policy"
+  role = aws_iam_role.lambda-iam.id
+  policy = jsonencode({
+    "Version" : "2012-10-17",
+    "Statement" : [
+      {
+        "Effect" : "Allow",
+        "Action" : ["dynamodb:*"],
+        "Resource" : "${aws_dynamodb_table.scheduler-db.arn}"
+      }
+    ]
+  })
 }
