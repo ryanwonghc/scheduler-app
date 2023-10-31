@@ -15,6 +15,7 @@ variable "aws_secret_key" {
 }
 
 variable "aws_lambda_iam_roles" {
+  description = "List of IAM Permissions"
   type        = list(string)
-  default     = ["AmazonDynamoDBFullAccess", "CloudWatchFullAccess"]
+  default     = ["AmazonDynamoDBFullAccess", "CloudWatchFullAccess","AWSLambdaBasicExecutionRole"]
 } 
