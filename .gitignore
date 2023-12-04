@@ -2,3 +2,5 @@
 .terraform/
 .terraform*
 *.tfvars
+config.py
+config.zip
