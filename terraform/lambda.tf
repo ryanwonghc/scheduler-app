@@ -97,23 +97,3 @@ resource "aws_lambda_function" "delete_task" {
   depends_on      = [ aws_iam_role_policy_attachment.lambda-policy ]
   # layers = 
 }
-
-# Authorizer function
-data "archive_file" "authorizer_zip" {
-  source_file   = "../lambdas/authorizer.py"
-  output_path   = "../lambdas/authorizer.zip"
-  type          = "zip"
-}
-
-resource "aws_lambda_function" "authorizer_lambda" {
-  memory_size     = "256"
-  timeout         = "30"
-  runtime         = "python3.9"
-  architectures   = ["x86_64"]
-  handler         = "authorizer.lambda_handler"
-  function_name   = "authorizer"
-  role            = aws_iam_role.lambda_iam.arn
-  filename        = "../lambdas/authorizer.zip"
-  depends_on      = [ aws_iam_role_policy_attachment.lambda-policy ]
-  # layers = 
-}
